@@ -1,0 +1,182 @@
+import React from 'react';
+import { StyleSheet,SafeAreaView,ScrollView,TouchableOpacity,View,Image,Text,Linking} from 'react-native';
+import Home from './src/components/Home';
+import Country from './src/components/Country';
+import Profile from './src/components/Profile';
+import Settings from './src/components/Settings';
+import Campaigns from './src/components/Campaigns';
+import Events from './src/components/Events';
+import { createAppContainer} from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+import { createDrawerNavigator,DrawerItems } from 'react-navigation-drawer';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+const AppNavigator = createStackNavigator(
+  {
+    Home: {
+      screen: Home,
+    },
+    Country: {
+      screen: Country,
+    }
+  },
+  {
+    headerMode: "none",
+    initialRouteName: "Home"
+  }
+);
+
+const CustomDrawerComponent = props => (
+    <SafeAreaView style={{ flex: 1 }}>
+      <View
+        style={{
+          height: 112,
+          backgroundColor: "#60c2a2",
+          paddingLeft: 10,
+          paddingBottom: 15
+        }}
+      >
+        <View
+        style={{
+         flex: 1,
+         flexDirection: "row",
+         alignItems: "flex-end"
+        }}
+        >
+          <Image 
+            source={require("./src/assets/images/user.png")}
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: 25,
+              marginRight: 10
+            }}          
+          />
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 14 
+            }}
+          >
+            Jhon Smith
+          </Text>
+        </View>
+      </View>
+      <ScrollView>
+       <DrawerItems {...props} />
+       <TouchableOpacity
+        style={styles.menuItem}
+        onPress={() => Linking.openURL("https://offerpedia.org/privacy")}
+       >
+         <Icon name="lock" style={styles.menuIcon} />
+         <Text style={styles.menuText}>Privacy</Text>
+       </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
+);
+
+const DrawerNavigator  = createDrawerNavigator(
+{
+  Home: {
+    screen: AppNavigator,
+    navigationOptions: {
+      drawerIcon: ({ tintColor }) => (
+        <Icon name="home" size={24} style={{ color: tintColor }} />),
+    }
+  },
+  Campaigns: {
+    screen: Campaigns,
+    navigationOptions: {
+      drawerIcon: ({ tintColor }) => (
+        <Icon name="cog" size={24} style={{ color: tintColor }} />),
+    }
+  },
+  Events: {
+    screen: Events,
+    navigationOptions: {
+      drawerIcon: ({ tintColor }) => (
+        <Icon name="user" size={24} style={{ color: tintColor }} />),
+    }
+  }
+},
+{ 
+  contentComponent: CustomDrawerComponent,
+  initialRouteName: "Home",
+  contentOptions: { activeTintColor: "#60c2a2" },
+ 
+}
+);
+
+
+const TabNavigator = createBottomTabNavigator({
+  Home: {
+    screen: DrawerNavigator,
+  },
+  Profile: {
+    screen: Profile,
+  },
+  Settings: {
+    screen: Settings,
+  }
+},
+{
+  defaultNavigationOptions: ({ navigation }) => ({
+    tabBarIcon: ({ focused, horizontal, tintColor }) => {
+      const { routeName } = navigation.state;     
+      let iconName;
+      if (routeName === 'Home') {
+        iconName = `home`;
+        // Sometimes we want to add badges to some icons.
+        // You can check the implementation below.       
+      } else if (routeName === 'Settings') {
+        iconName = `cog`;
+      }
+      else if (routeName === 'Profile') {
+        iconName = `user`;
+      }
+
+      // You can return any component that you like here!
+      return <Icon name={iconName} size={25} color={tintColor} />;
+    },
+  }),
+  tabBarOptions: {
+    activeTintColor: 'tomato',
+    inactiveTintColor: 'gray',
+  },
+}
+);
+
+
+const AppContainer = createAppContainer(TabNavigator);
+
+export default class App extends React.Component {    
+    render() {
+        return <AppContainer />;
+  }
+}
+const styles = StyleSheet.create({
+  menuItem: {
+     flex: 1,
+     flexDirection: "row",
+     paddingLeft: 20,
+     alignItems: "center",
+     marginTop: 5,
+     marginBottom: 15
+
+  },
+  menuText: {
+    paddingLeft: 20,
+    color: "#222",
+    fontSize:14,
+    fontWeight: "bold"
+
+  },  
+  menuIcon: {
+     marginRight: 15,
+     fontSize: 24,
+     color: "#666"
+
+  }
+
+}); 
